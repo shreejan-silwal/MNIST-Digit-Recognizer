@@ -2,17 +2,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import gzip
 from tensorflow import keras
 import ssl
 
+# disable ssl verification (not recommended if the code runs without this part)
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # load the data
 (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
-
-print(X_train.shape)
-print(y_train.shape)
 
 # normalize the data
 X_train = X_train / 255.0
@@ -37,8 +34,23 @@ model = keras.Sequential([
 # Compile the model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Train the model
-model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+# define lists to store loss values
+train_loss = []
+val_loss = []
+
+# Train the model and store loss values
+history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+# plot the training and validation loss
+plt.plot(train_loss, label='Training loss')
+plt.plot(val_loss, label='Validation loss')
+plt.title('Training and Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
 
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test, y_test)
