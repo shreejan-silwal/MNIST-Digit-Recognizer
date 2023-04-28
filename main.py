@@ -2,10 +2,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import gzip
 from tensorflow import keras
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # load the data
 (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
+
+print(X_train.shape)
+print(y_train.shape)
 
 # normalize the data
 X_train = X_train / 255.0
