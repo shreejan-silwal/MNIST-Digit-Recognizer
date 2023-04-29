@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
+from keras.models import load_model
 import ssl
 
 # disable ssl verification (not recommended if the code runs without this part)
@@ -27,10 +28,16 @@ y_test = keras.utils.to_categorical(y_test)
 model = keras.Sequential([
     keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),
     keras.layers.MaxPooling2D((2,2)),
+    keras.layers.Conv2D(64, (3,3), activation='relu'),
+    keras.layers.MaxPooling2D((2,2)),
+    keras.layers.Conv2D(128, (3,3), activation='relu'),
     keras.layers.Flatten(),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(128, activation='relu'),
     keras.layers.Dropout(0.2),
     keras.layers.Dense(10, activation='softmax')
 ])
+
 
 # compile the model
 model.compile(
@@ -45,10 +52,12 @@ val_loss = []
 
 # train the model and store loss values
 history = model.fit(
-    X_train, y_train, epochs=10, 
+    X_train, y_train, epochs=20, 
     batch_size=32, 
     validation_data=(X_test, y_test)
     )
+
+model.save('my_model.h5')
 
 train_loss = history.history['loss']
 val_loss = history.history['val_loss']
@@ -66,6 +75,3 @@ plt.show()
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f"Test accuracy: {accuracy:.3f}")
 
-# Make predictions
-predictions = model.predict(X_test[:5])
-print(np.argmax(predictions, axis=1))
